@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Civic Launcher</title>
+<style>
+:root{--bg:#e2e8f0;--card:rgba(255,255,255,.88);--tx:#1e293b;--sub:#5b6b80;--chip:#f1f5f9;--track:#cbd5e1;--acc:#f97316}
+html.dark{--bg:#020617;--card:rgba(15,23,42,.9);--tx:#f1f5f9;--sub:#94a3b8;--chip:#1e293b;--track:#334155}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--tx);font-family:Inter,Roboto,Arial,sans-serif;display:flex;flex-direction:column;gap:10px;padding:14px;user-select:none;overflow:hidden;transition:background .3s}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.card{background:var(--card);border-radius:24px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:background .3s}
+.row{display:flex;align-items:center}.between{justify-content:space-between}
+.sub{color:var(--sub)}.small{font-size:14px}.acc{color:var(--acc)}
+header{display:flex;justify-content:space-between;align-items:center;padding:8px 18px;border-radius:18px}
+.logo{width:34px;height:34px;border-radius:50%;background:var(--acc);color:#1c0f05;display:flex;align-items:center;justify-content:center}
+.hello{font-size:20px;font-weight:700}.clock{font-size:24px}
+main{flex:1;min-height:0;display:grid;grid-template-columns:4fr 5fr 3fr;gap:14px}
+main>section{display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-height:0;overflow:hidden}
+.track{background:var(--chip);border-radius:18px;padding:12px}
+.art{width:70px;height:70px;border-radius:14px;background:var(--track);color:var(--acc);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.title{font-size:20px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:6px;border-radius:3px;background:var(--track);overflow:hidden;margin-bottom:4px}.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .4s}
+.ctrl{display:flex;justify-content:center;align-items:center;gap:22px}
+.sm{width:52px;height:52px;border-radius:50%;background:var(--chip);display:flex;align-items:center;justify-content:center}
+.big{width:70px;height:70px;border-radius:50%;background:var(--acc);color:#1c0f05;display:flex;align-items:center;justify-content:center}
+.pill{background:var(--acc);color:#1c0f05;font-weight:700;border-radius:18px;padding:8px 16px}
+.note{background:var(--chip);border-radius:14px;padding:10px;font-size:13px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.foot{border-top:1px solid var(--track);padding-top:8px}
+.center{background:#0f172a!important;color:#f1f5f9;align-items:center;justify-content:center!important;text-align:center}
+.gauge{position:relative;width:250px;height:250px}.gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gauge div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#speed{font-size:76px;font-weight:900;line-height:1}
+.maps{background:var(--chip);border-radius:16px;padding:10px;gap:10px;width:100%;text-align:left}
+.maps span.i{background:var(--acc);color:#1c0f05;border-radius:12px;padding:8px;display:flex}
+.map{flex:1;border-radius:16px;background:var(--chip);position:relative;overflow:hidden;border:1px solid var(--track)}
+#dock{display:flex;justify-content:space-around;padding:8px 18px;border-radius:18px}
+.dk{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 8px}
+.di{width:54px;height:54px;border-radius:50%;background:var(--chip);display:flex;align-items:center;justify-content:center}
+.dk.main .di{background:var(--acc);color:#1c0f05;border-radius:18px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9}
+.sheet{background:var(--bg);color:var(--tx);border-radius:24px;padding:20px;width:100%;max-width:640px;max-height:90vh;overflow:auto}
+#grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.app{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px}
+.app span{width:56px;height:56px;border-radius:16px;background:var(--acc);color:#1c0f05;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center}
+input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--track);background:var(--chip);color:var(--tx);font:inherit;margin:8px 0 12px}
+</style>
+</head>
+<body>
+<header class="card">
+  <div class="row" style="gap:12px">
+    <div class="logo" id="logo"></div>
+    <div><div class="hello" id="hello">Bienvenido, Fabricio</div><div class="sub small" id="gps">Sin GPS</div></div>
+  </div>
+  <div class="row" style="gap:22px">
+    <button id="themeBtn" class="row" style="gap:8px" aria-label="Cambiar tema"><span id="themeIcon"></span><b class="small" id="themeLabel">Auto</b></button>
+    <div class="row" style="gap:6px"><span id="volIcon"></span><b class="small" id="vol">0%</b></div>
+    <b class="clock" id="clock">12:00</b>
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <div class="row acc" style="gap:8px"><span id="srcIcon"></span><b id="srcLabel">Sin fuente</b></div>
+    <div class="track row" style="gap:14px">
+      <div class="art" id="art"></div>
+      <div style="min-width:0"><div class="title" id="title">Nada reproduciéndose</div><div class="sub" id="artist"></div></div>
+    </div>
+    <div><div class="bar"><i id="bar"></i></div><div class="row between sub small"><span id="cur">0:00</span><span id="dur">0:00</span></div></div>
+    <div class="ctrl">
+      <button class="sm" id="prev" aria-label="Anterior"></button>
+      <button class="big" id="pp" aria-label="Reproducir o pausar"></button>
+      <button class="sm" id="next" aria-label="Siguiente"></button>
+    </div>
+    <div class="note" id="access" hidden><span>Falta dar acceso a notificaciones para leer lo que suena.</span><button class="pill" id="grant">Dar acceso</button></div>
+    <div class="row between sub small foot"><span class="row" style="gap:8px"><span id="aaIcon"></span>Android Auto</span><button class="pill" id="aa">Conectar</button></div>
+  </section>
+
+  <section class="card center">
+    <div class="gauge">
+      <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" stroke="#1e293b" stroke-width="6" fill="none"/><circle id="arc" cx="50" cy="50" r="40" stroke="#f97316" stroke-width="6" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2" fill="none"/></svg>
+      <div><span id="speed">0</span><span style="color:#94a3b8;letter-spacing:3px;font-size:14px;font-weight:600">KM/H</span></div>
+    </div>
+    <span style="color:#94a3b8;font-size:14px" id="gpsSub">Sin GPS</span>
+  </section>
+
+  <section class="card">
+    <div class="row between"><b class="small">Navegación</b><span class="acc" id="navIcon"></span></div>
+    <button class="maps row" id="maps"><span class="i" id="mapsIcon"></span><span><b class="small">Google Maps</b><br><span class="sub" style="font-size:12px">Toca para navegar</span></span></button>
+    <div class="map"><svg width="100%" height="100%" viewBox="0 0 150 200" preserveAspectRatio="xMidYMid slice"><path d="M0 60H150M0 130H150M50 0V200M110 0V200" stroke="var(--track)" stroke-width="6"/><path d="M80 0V90L60 120V200" fill="none" stroke="#f97316" stroke-width="5" stroke-linecap="round"/><circle cx="68" cy="106" r="7" fill="var(--bg)" stroke="#f97316" stroke-width="4"/></svg></div>
+  </section>
+</main>
+
+<nav class="card" id="dock"></nav>
+
+<div class="modal" id="appsM" hidden><div class="sheet">
+  <div class="row between" style="margin-bottom:14px"><b style="font-size:20px">Aplicaciones</b><button id="closeApps" aria-label="Cerrar"></button></div>
+  <div id="grid"></div>
+</div></div>
+
+<div class="modal" id="setM" hidden><div class="sheet">
+  <div class="row between"><b style="font-size:20px">Ajustes</b><button id="closeSet" aria-label="Cerrar"></button></div>
+  <label for="helloIn" class="sub small" style="display:block;margin-top:12px">Texto de bienvenida</label>
+  <input id="helloIn" type="text">
+  <div class="row" style="gap:10px;flex-wrap:wrap"><button class="pill" id="saveSet">Guardar</button><button class="pill" id="sysSet">Ajustes de Android</button><button class="pill" id="accSet">Permiso de notificaciones</button></div>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id), A=typeof Android!=='undefined'?Android:null;
+const I={
+ car:'<path d="M4 16l2-6h12l2 6v3H4zM7 16h.01M17 16h.01"/>',
+ usb:'<path d="M12 3v13M12 8l4 3M12 12l-4-3"/><circle cx="12" cy="19" r="2"/>',
+ bt:'<path d="M7 7l10 10-5 5V2l5 5L7 17"/>',
+ music:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+ play:'<path d="M7 4l13 8-13 8z" fill="currentColor"/>',
+ pause:'<path d="M7 4h4v16H7zM13 4h4v16h-4z" fill="currentColor"/>',
+ prev:'<path d="M6 5h2v14H6zM20 5v14L9 12z" fill="currentColor"/>',
+ next:'<path d="M16 5h2v14h-2zM4 5v14l11-7z" fill="currentColor"/>',
+ radio:'<rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8l10-5M8 14h4"/>',
+ phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/>',
+ grid:'<rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/>',
+ pin:'<path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>',
+ moon:'<path d="M21 13A9 9 0 1111 3a7 7 0 0010 10z"/>',
+ auto:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 000 18z" fill="currentColor"/>',
+ vol:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 010 6"/>',
+ x:'<path d="M6 6l12 12M18 6L6 18"/>',
+ arrow:'<path d="M3 11l18-8-8 18-2-8z"/>'
+};
+const ic=(n,s=24)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
+const put=(id,n,s)=>{$(id).innerHTML=ic(n,s)};
+put('logo','car',20);put('volIcon','vol',20);put('aaIcon','car',18);put('art','music',34);
+put('prev','prev',22);put('next','next',22);put('pp','play',30);put('navIcon','arrow',18);put('mapsIcon','arrow',20);
+put('closeApps','x',24);put('closeSet','x',24);
+const fmt=t=>Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
+const show=id=>$(id).hidden=false, hide=id=>$(id).hidden=true;
+
+/* ---- Tema: Auto (sigue la señal de noche del sistema/luces) / Oscuro / Claro ---- */
+const MODES=['auto','dark','light'],MUI={auto:['auto','Auto'],dark:['moon','Oscuro'],light:['sun','Claro']};
+let mode='auto',nightFlag=null;
+try{mode=localStorage.getItem('mode')||'auto'}catch(e){}
+const mq=matchMedia('(prefers-color-scheme: dark)');
+function applyTheme(){
+  const night=nightFlag!==null?nightFlag:mq.matches;
+  document.documentElement.classList.toggle('dark',mode==='dark'||(mode==='auto'&&night));
+  put('themeIcon',MUI[mode][0],20);$('themeLabel').textContent=MUI[mode][1];
+}
+mq.addEventListener('change',applyTheme);
+window.setNightMode=v=>{nightFlag=v;applyTheme()};
+$('themeBtn').onclick=()=>{mode=MODES[(MODES.indexOf(mode)+1)%3];try{localStorage.setItem('mode',mode)}catch(e){}applyTheme()};
+
+/* ---- Fuente de audio ---- */
+const SRC={usb:['usb','USB'],bt:['bt','Bluetooth'],ytm:['music','YouTube Music'],other:['music','Música']};
+function setSrc(k){const [i,l]=SRC[k]||['music','Sin fuente'];put('srcIcon',i,20);$('srcLabel').textContent=l}
+function setSpeed(v){$('speed').textContent=v;$('arc').setAttribute('stroke-dashoffset',251.2-Math.min(v,180)/180*200)}
+
+/* ---- Estado que llega desde Android cada segundo ---- */
+let lastNight=null,lastPlaying=null;
+window.onState=s=>{
+  if(s.night!==lastNight){lastNight=s.night;window.setNightMode(s.night)}
+  $('vol').textContent=s.vol+'%';
+  setSpeed(s.speed);
+  $('gps').textContent=$('gpsSub').textContent=s.gps?'GPS activo':'Sin GPS';
+  $('access').hidden=s.access;
+  if('source' in s){
+    setSrc(s.source);
+    $('title').textContent=s.title||'Sin título';$('artist').textContent=s.artist||'';
+    $('cur').textContent=fmt(s.pos);$('dur').textContent=fmt(s.dur);
+    $('bar').style.width=(s.dur>0?Math.min(100,s.pos/s.dur*100):0)+'%';
+    if(s.playing!==lastPlaying){lastPlaying=s.playing;put('pp',s.playing?'pause':'play',30)}
+  }else{
+    setSrc(null);$('title').textContent='Nada reproduciéndose';$('artist').textContent='';
+    $('cur').textContent=$('dur').textContent='0:00';$('bar').style.width='0%';
+    if(lastPlaying!==false){lastPlaying=false;put('pp','play',30)}
+  }
+};
+
+/* ---- Controles ---- */
+$('pp').onclick=()=>A&&A.cmd('playpause');
+$('next').onclick=()=>A&&A.cmd('next');
+$('prev').onclick=()=>A&&A.cmd('prev');
+$('grant').onclick=()=>A&&A.openAccess();
+$('aa').onclick=()=>A&&A.launchLabel('android auto');
+$('maps').onclick=()=>A&&A.openMaps();
+
+/* ---- Dock y apps ---- */
+function openApps(){
+  const g=$('grid');g.innerHTML='';let list=[];
+  try{list=JSON.parse(A?A.apps():'[]')}catch(e){}
+  list.forEach(a=>{
+    const b=document.createElement('button');b.className='app';b.dataset.pkg=a.pkg;
+    const s=document.createElement('span');s.textContent=(a.label[0]||'?').toUpperCase();
+    const l=document.createElement('small');l.textContent=a.label;
+    b.append(s,l);g.append(b);
+  });
+  show('appsM');
+}
+$('grid').onclick=e=>{const b=e.target.closest('button');if(b&&A){A.launchPkg(b.dataset.pkg);hide('appsM')}};
+$('closeApps').onclick=()=>hide('appsM');
+const DOCK=[
+  ['radio','Radio',()=>A.launchLabel('radio')],
+  ['music','Música',()=>A.launchPkg('com.hcn.AutoMediaPlayer')],
+  ['phone','Teléfono',()=>A.dial()],
+  ['grid','Apps',openApps],
+  ['car','Android Auto',()=>A.launchLabel('android auto')],
+  ['pin','Navegación',()=>A.openMaps()],
+  ['gear','Ajustes',()=>show('setM')]
+];
+$('dock').innerHTML=DOCK.map((d,i)=>`<button class="dk${d[1]==='Apps'?' main':''}" data-i="${i}"><span class="di">${ic(d[0],26)}</span><span class="small">${d[1]}</span></button>`).join('');
+$('dock').onclick=e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const d=DOCK[b.dataset.i];if(A||d[1]==='Apps'||d[1]==='Ajustes')d[2]();
+};
+
+/* ---- Ajustes ---- */
+try{const h=localStorage.getItem('hello');if(h)$('hello').textContent=h}catch(e){}
+$('helloIn').value=$('hello').textContent;
+$('saveSet').onclick=()=>{
+  const v=$('helloIn').value.trim();
+  if(v){$('hello').textContent=v;try{localStorage.setItem('hello',v)}catch(e){}}
+  hide('setM');
+};
+$('closeSet').onclick=()=>hide('setM');
+$('sysSet').onclick=()=>A&&A.openSettings();
+$('accSet').onclick=()=>A&&A.openAccess();
+
+/* ---- Reloj e inicio ---- */
+function tick(){const d=new Date();$('clock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+setInterval(tick,1000);tick();
+applyTheme();setSrc(null);setSpeed(0);
+</script>
+</body>
+</html>
